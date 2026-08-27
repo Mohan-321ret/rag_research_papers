@@ -1,0 +1,11 @@
+﻿1. Introduction
+Enterprise knowledge bases change continuously as policies, products and
+regulations evolve. Static retrieval systems answer from stale snapshots.
+
+2. Drift-Aware Retrieval
+We version every document and measure semantic distance between versions.
+Retrieval penalizes chunks whose knowledge has drifted from the current state.
+
+3. Evaluation
+Experiments on enterprise corpora show improved answer freshness and
+citation accuracy compared to conventional RAG baselines.

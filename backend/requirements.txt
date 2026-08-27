@@ -1,0 +1,3 @@
+# Full production dependency set (installed in the Docker image).
+-r requirements-core.txt
+-r requirements-ml.txt

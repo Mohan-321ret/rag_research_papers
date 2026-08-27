@@ -1,0 +1,10 @@
+# ML / RAG dependencies.
+# sentence-transformers (torch) and faiss-cpu install fine on Python
+# 3.11-3.14 (verified locally on 3.14 with torch 2.13 / faiss-cpu 1.15).
+# The app degrades gracefully if this file is not installed: uploads are
+# accepted but processing reports 503 until the stack is present.
+langchain>=0.3
+langchain-community>=0.3
+langchain-text-splitters>=0.3
+sentence-transformers>=3.0
+faiss-cpu>=1.8

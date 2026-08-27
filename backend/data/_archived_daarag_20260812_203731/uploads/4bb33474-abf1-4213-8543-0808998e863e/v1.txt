@@ -1,0 +1,7 @@
+﻿1. Introduction
+The DAA-RAG system combines PostgreSQL, FAISS and Neo4j into a hybrid
+knowledge repository. Drift Detection compares embeddings across versions.
+
+2. Graph Model
+Every Document has Version nodes, each Version contains Chunk nodes, and
+chunks mention entities like Knowledge Graph and Vector Search.

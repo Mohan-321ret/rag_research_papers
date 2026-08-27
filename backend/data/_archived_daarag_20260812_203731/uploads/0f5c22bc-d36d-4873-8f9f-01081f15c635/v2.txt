@@ -1,0 +1,35 @@
+1. Annual Leave
+Annual leave is 25 days per calendar year.
+
+2. Sick Leave
+Sick leave is 15 days per calendar year.
+
+3. Remote Work
+Remote work requires written manager approval.
+
+4. Expenses
+Expense claims must be filed within 30 days.
+
+5. Travel
+Economy class is standard for all air travel.
+
+6. Equipment
+Laptops are refreshed every three years.
+
+7. Training
+Each employee receives a 1000 dollar training budget.
+
+8. Parental Leave
+Primary caregivers receive 16 weeks of paid leave.
+
+9. Overtime
+Overtime is compensated at 1.5 times the base rate.
+
+10. Probation
+New joiners serve a six month probation period.
+
+11. Notice Period
+The standard notice period is one month.
+
+12. Confidentiality
+Confidential information includes customer records.

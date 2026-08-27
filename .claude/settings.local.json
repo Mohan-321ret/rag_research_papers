@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./.venv/Scripts/python.exe -m pytest tests/test_verification.py tests/test_verification_api.py -q)",
+      "Bash(./.venv/Scripts/python.exe -c ' *)",
+      "Bash(./.venv/Scripts/python.exe -m pytest tests/test_llm_generation.py tests/test_chat.py tests/test_context_fusion_api.py -q -k \"not ollama\")",
+      "Bash(./.venv/Scripts/python.exe -m pytest tests/test_verification.py tests/test_verification_api.py -q --no-header)",
+      "Bash(./.venv/Scripts/python.exe -m pytest -q --no-header -rs)",
+      "Bash(./.venv/Scripts/python.exe -m pytest -q --no-header)",
+      "Bash(./.venv/Scripts/python.exe -m pytest --collect-only -q)",
+      "Bash(./.venv/Scripts/python.exe -m pytest -q --no-header -p no:warnings)"
+    ]
+  }
+}
