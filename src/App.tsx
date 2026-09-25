@@ -13,6 +13,8 @@ import QuestionGeneratorPage from "@/pages/QuestionGeneratorPage";
 import CollectionsPage from "@/pages/CollectionsPage";
 import ProfilePage from "@/pages/ProfilePage";
 import SettingsPage from "@/pages/SettingsPage";
+import ExternalSourcesPage from "@/pages/ExternalSourcesPage";
+import UploadPage from "@/pages/UploadPage";
 
 export default function App() {
   return (
@@ -26,8 +28,10 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/upload" element={<UploadPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/external" element={<ExternalSourcesPage />} />
             <Route path="/paper/:id" element={<PaperDetailPage />} />
             <Route path="/citations" element={<CitationPage />} />
             <Route path="/gaps" element={<ResearchGapPage />} />

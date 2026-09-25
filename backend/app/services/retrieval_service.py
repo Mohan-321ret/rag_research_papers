@@ -65,6 +65,7 @@ class RetrievalService:
         top_k: int,
         *,
         force_route: RetrievalRoute | None = None,
+        include_external: bool | None = None,
     ) -> RetrievalResult:
         """``force_route`` bypasses the adaptive router — used by the explicit
         /search/semantic and /search/hybrid endpoints, where the caller has
@@ -113,6 +114,14 @@ class RetrievalService:
             fallback_used = True
 
         items = await self._rank_and_hydrate(ranked_lists, native_scores, top_k, as_of)
+        
+        should_fetch_external = (include_external is True)
+        if should_fetch_external:
+            ext_items = await self._external_arxiv_hits(query_text, top_k)
+            if ext_items:
+                items.extend(ext_items)
+                ranked_lists["arxiv"] = [str(it.item.chunk.id) for it in ext_items]
+
         result = RetrievalResult(
             route=route,
             reasons=reasons,
@@ -226,4 +235,54 @@ class RetrievalService:
                 )
             if len(items) >= top_k:
                 break
+        return items
+
+    async def _external_arxiv_hits(
+        self, query_text: str, top_k: int
+    ) -> list[RetrievedItem]:
+        from app.models.document import DocumentChunk
+        from app.repositories.chunk_repository import RetrievableChunk
+        from app.services.external_sources_service import search_arxiv
+
+        try:
+            papers = await search_arxiv(query_text, max_results=min(top_k, 5))
+        except Exception as exc:
+            logger.warning("external_arxiv_retrieval_failed", error=str(exc))
+            return []
+
+        items: list[RetrievedItem] = []
+        for p in papers:
+            chunk_uuid = uuid.uuid5(uuid.NAMESPACE_URL, f"arxiv:{p.external_id}")
+            doc_uuid = uuid.uuid5(uuid.NAMESPACE_URL, f"doc:arxiv:{p.external_id}")
+            content = (
+                f"Title: {p.title}\n"
+                f"Authors: {p.authors or 'Unknown'}\n"
+                f"Published: {p.published or 'N/A'}\n"
+                f"Source: arXiv ({p.external_id})\n"
+                f"URL: {p.url}\n\n"
+                f"Abstract:\n{p.abstract}"
+            )
+            mock_chunk = DocumentChunk(
+                id=chunk_uuid,
+                version_id=doc_uuid,
+                document_id=doc_uuid,
+                chunk_index=0,
+                content=content,
+                section="arXiv Abstract",
+                page_number=1,
+                token_count=len(content.split()),
+                embedding_ref=f"arxiv_{p.external_id}",
+            )
+            retrievable = RetrievableChunk(
+                chunk=mock_chunk,
+                document_title=f"[arXiv] {p.title}",
+                version_number=1,
+            )
+            items.append(
+                RetrievedItem(
+                    item=retrievable,
+                    score=0.75,
+                    retrievers=["arxiv"],
+                )
+            )
         return items

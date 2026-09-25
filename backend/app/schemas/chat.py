@@ -11,6 +11,10 @@ from app.schemas.query_intelligence import StructuredQueryRead
 class ChatQueryRequest(BaseModel):
     query: str = Field(min_length=1, max_length=4000)
     top_k: int | None = Field(default=None, ge=1, le=20)
+    include_external: bool | None = Field(
+        default=None,
+        description="Include external research paper sources (e.g. arXiv) in RAG retrieval",
+    )
 
 
 class CitationItem(BaseModel):

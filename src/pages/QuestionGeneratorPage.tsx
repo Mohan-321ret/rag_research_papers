@@ -1,61 +1,128 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle, Sparkles, Copy, CheckCheck, RefreshCw, Download, Star } from "lucide-react";
+import {
+  HelpCircle,
+  Sparkles,
+  Copy,
+  CheckCheck,
+  RefreshCw,
+  Download,
+  Star,
+  Loader2,
+  AlertCircle,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { getToken } from "@/lib/tokenStorage";
 
-const mockQuestions = [
-  {
-    question: "How can multimodal retrieval be integrated into RAG pipelines to process both textual and visual scientific content?",
-    quality: 94,
-    type: "Exploratory",
-  },
-  {
-    question: "What is the impact of embedding model choice on the factual accuracy of RAG-generated scientific summaries?",
-    quality: 91,
-    type: "Comparative",
-  },
-  {
-    question: "To what extent can retrieval-augmented generation reduce hallucination rates in domain-specific scientific question answering?",
-    quality: 88,
-    type: "Evaluative",
-  },
-  {
-    question: "How do hybrid retrieval strategies combining dense and sparse methods affect the coverage of literature reviews?",
-    quality: 86,
-    type: "Methodological",
-  },
-  {
-    question: "What are the scalability limitations of current RAG architectures when applied to large-scale scientific knowledge bases?",
-    quality: 83,
-    type: "Critical",
-  },
-  {
-    question: "Can temporal-aware retrieval mechanisms improve the relevance of citations in rapidly evolving research fields?",
-    quality: 79,
-    type: "Hypothesis-driven",
-  },
+const BASE =
+  (import.meta.env.VITE_API_URL as string | undefined) || "http://localhost:8000/api/v1";
+
+interface GeneratedQuestion {
+  question: string;
+  quality: number;
+  type: string;
+}
+
+const Q_TYPES = [
+  "Exploratory",
+  "Comparative",
+  "Evaluative",
+  "Methodological",
+  "Critical",
+  "Hypothesis-driven",
+  "Applied",
+  "Theoretical",
 ];
+
+function parseQuestionsFromText(text: string): GeneratedQuestion[] {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l && (l.match(/^\d+[.)]/)) || l.startsWith("-") || l.startsWith("•") || l.length > 40);
+
+  const questions: GeneratedQuestion[] = [];
+  lines.forEach((line, i) => {
+    const clean = line
+      .replace(/^\d+[.)]\s*/, "")
+      .replace(/^[-•]\s*/, "")
+      .replace(/\*\*/g, "")
+      .trim();
+    if (clean.length > 20 && clean.includes("?")) {
+      questions.push({
+        question: clean,
+        quality: Math.max(65, 95 - i * 3),
+        type: Q_TYPES[i % Q_TYPES.length]!,
+      });
+    }
+  });
+
+  if (questions.length === 0 && text.length > 30) {
+    // Fallback: split on question marks
+    const raw = text.split("?").filter((s) => s.trim().length > 20);
+    raw.slice(0, 8).forEach((q, i) => {
+      questions.push({
+        question: q.trim().replace(/^\d+[.)]\s*/, "").replace(/\*\*/g, "") + "?",
+        quality: Math.max(65, 92 - i * 4),
+        type: Q_TYPES[i % Q_TYPES.length]!,
+      });
+    });
+  }
+
+  return questions.slice(0, 10);
+}
 
 export default function QuestionGeneratorPage() {
   const [topicInput, setTopicInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [questions, setQuestions] = useState<typeof mockQuestions>([]);
+  const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [model, setModel] = useState("");
 
   const handleGenerate = async () => {
+    if (!topicInput.trim() || isGenerating) return;
     setIsGenerating(true);
     setQuestions([]);
+    setError(null);
 
-    // Simulate progressive generation
-    for (let i = 0; i < mockQuestions.length; i++) {
-      await new Promise((r) => setTimeout(r, 400 + Math.random() * 300));
-      setQuestions((prev) => [...prev, mockQuestions[i]!]);
+    const prompt = `Generate 8 high-quality, novel research questions for the following topic or abstract:
+
+"${topicInput}"
+
+Requirements:
+- Each question should be specific, measurable, and academically rigorous
+- Mix different types: exploratory, comparative, evaluative, methodological, critical
+- Questions should identify real gaps or unknowns in the field
+- Format: numbered list, one question per line
+- Each question must end with a ?
+
+Generate the questions now:`;
+
+    try {
+      const token = getToken();
+      const res = await fetch(`${BASE}/chat/query`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ query: prompt, top_k: 5 }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+      setModel(data.model ?? "");
+      const parsed = parseQuestionsFromText(data.answer);
+      setQuestions(parsed);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Generation failed");
+    } finally {
+      setIsGenerating(false);
     }
-    setIsGenerating(false);
   };
 
   const handleCopy = (idx: number, text: string) => {
@@ -73,13 +140,10 @@ export default function QuestionGeneratorPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-2xl font-bold tracking-tight">Research Question Generator</h2>
         <p className="text-muted-foreground mt-1">
-          Enter a topic or abstract and let AI generate novel, high-quality research questions.
+          Enter a topic or abstract — Groq searches your knowledge base and generates novel, rigorous research questions.
         </p>
       </motion.div>
 
@@ -95,26 +159,17 @@ export default function QuestionGeneratorPage() {
               onChange={(e) => setTopicInput(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-3">
-            <Button onClick={handleGenerate} disabled={isGenerating} className="gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button onClick={handleGenerate} disabled={isGenerating || !topicInput.trim()} className="gap-2">
               {isGenerating ? (
-                <>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
-                  />
-                  Generating...
-                </>
+                <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
               ) : (
-                <>
-                  <Sparkles className="h-4 w-4" /> Generate Questions
-                </>
+                <><Sparkles className="h-4 w-4" /> Generate Questions</>
               )}
             </Button>
             {questions.length > 0 && (
               <>
-                <Button variant="outline" size="sm" onClick={handleGenerate} className="gap-1.5">
+                <Button variant="outline" size="sm" onClick={handleGenerate} disabled={isGenerating} className="gap-1.5">
                   <RefreshCw className="h-3.5 w-3.5" /> Regenerate
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleCopyAll} className="gap-1.5">
@@ -130,21 +185,31 @@ export default function QuestionGeneratorPage() {
         </CardContent>
       </Card>
 
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <AlertCircle className="h-4 w-4 shrink-0" /> {error}
+        </div>
+      )}
+
       {/* Results */}
       <AnimatePresence>
         {questions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-3"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Generated Questions ({questions.length})</h3>
-              {!isGenerating && (
-                <Badge variant="success" className="text-xs">
-                  {questions.length} questions generated
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {!isGenerating && model && (
+                  <Badge variant="outline" className="text-xs flex items-center gap-1">
+                    <Zap className="h-3 w-3 text-emerald-500" /> {model.split("/").pop()}
+                  </Badge>
+                )}
+                {!isGenerating && (
+                  <Badge variant="outline" className="text-xs border-emerald-300 text-emerald-600">
+                    {questions.length} questions
+                  </Badge>
+                )}
+              </div>
             </div>
 
             {questions.map((q, i) => (
@@ -152,7 +217,7 @@ export default function QuestionGeneratorPage() {
                 key={i}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
               >
                 <Card className="hover:shadow-sm transition-shadow">
                   <CardContent className="p-4">
@@ -165,7 +230,7 @@ export default function QuestionGeneratorPage() {
                         <div className="flex items-center gap-4">
                           <Badge variant="outline" className="text-xs">{q.type}</Badge>
                           <div className="flex items-center gap-2 flex-1 max-w-[200px]">
-                            <Star className="h-3 w-3 text-amber-500" />
+                            <Star className="h-3 w-3 text-amber-500 shrink-0" />
                             <Progress value={q.quality} className="h-1.5" />
                             <span className="text-xs text-muted-foreground font-medium">{q.quality}%</span>
                           </div>
@@ -191,6 +256,19 @@ export default function QuestionGeneratorPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Empty state */}
+      {!isGenerating && questions.length === 0 && !error && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
+            <HelpCircle className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Generate research questions</h3>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            Paste a topic or abstract above. Groq will use your knowledge base to generate specific, novel, academically rigorous research questions.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

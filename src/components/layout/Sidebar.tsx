@@ -17,6 +17,8 @@ import {
   ChevronRight,
   Sparkles,
   HelpCircle,
+  Globe,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
@@ -25,8 +27,10 @@ import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/upload", label: "Upload Papers", icon: Upload },
   { path: "/chat", label: "AI Research Chat", icon: MessageSquare },
   { path: "/search", label: "Paper Search", icon: Search },
+  { path: "/external", label: "External Sources", icon: Globe },
   { path: "/gaps", label: "Research Gaps", icon: GitFork },
   { path: "/citations", label: "Citations", icon: Quote },
   { path: "/questions", label: "Question Generator", icon: HelpCircle },

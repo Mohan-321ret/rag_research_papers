@@ -131,7 +131,9 @@ class ChatService:
 
         # Module 6: route to BM25/vector/graph/hybrid, over-fetching a
         # candidate pool for the fusion pipeline to work with.
-        retrieval = await self._retrieval.retrieve(request.query, analysis, candidate_k)
+        retrieval = await self._retrieval.retrieve(
+            request.query, analysis, candidate_k, include_external=request.include_external
+        )
 
         # Module 7: dedup -> rerank -> compress -> SOURCE-N context blocks.
         fusion = await self._context_fusion.fuse(request.query, retrieval.items, final_k)

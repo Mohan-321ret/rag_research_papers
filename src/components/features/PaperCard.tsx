@@ -14,6 +14,20 @@ interface PaperCardProps {
   onView?: (id: string) => void;
 }
 
+const SOURCE_LABEL: Record<string, string> = {
+  arxiv: "arXiv",
+  pubmed: "PubMed",
+  semantic_scholar: "Semantic Scholar",
+  local: "Local",
+};
+
+const SOURCE_CLASS: Record<string, string> = {
+  arxiv: "border-red-300 text-red-600 dark:text-red-400",
+  pubmed: "border-blue-300 text-blue-600 dark:text-blue-400",
+  semantic_scholar: "border-emerald-300 text-emerald-600 dark:text-emerald-400",
+  local: "",
+};
+
 export function PaperCard({ paper, index = 0, onSave, onCite, onView }: PaperCardProps) {
   const scoreColor =
     paper.similarityScore >= 0.9
@@ -21,6 +35,9 @@ export function PaperCard({ paper, index = 0, onSave, onCite, onView }: PaperCar
       : paper.similarityScore >= 0.8
       ? "text-blue-600 dark:text-blue-400"
       : "text-amber-600 dark:text-amber-400";
+
+  const hasPdf = paper.pdfUrl && paper.pdfUrl !== "#";
+  const hasSource = paper.sourceUrl && paper.sourceUrl !== "#";
 
   return (
     <motion.div
@@ -32,13 +49,22 @@ export function PaperCard({ paper, index = 0, onSave, onCite, onView }: PaperCar
         <CardContent className="p-5">
           {/* Header row */}
           <div className="flex items-start justify-between gap-3 mb-2">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
               <Badge variant="secondary" className="font-normal">
                 {paper.venue}
               </Badge>
               <span>{paper.year}</span>
+              {/* Source badge with real link */}
+              {paper.source && paper.source !== "local" && (
+                <Badge
+                  variant="outline"
+                  className={cn("font-normal text-xs", SOURCE_CLASS[paper.source])}
+                >
+                  {SOURCE_LABEL[paper.source] ?? paper.source}
+                </Badge>
+              )}
             </div>
-            <div className={cn("flex items-center gap-1 text-sm font-semibold", scoreColor)}>
+            <div className={cn("flex items-center gap-1 text-sm font-semibold shrink-0", scoreColor)}>
               {(paper.similarityScore * 100).toFixed(0)}%
               <span className="text-xs font-normal text-muted-foreground">match</span>
             </div>
@@ -78,15 +104,33 @@ export function PaperCard({ paper, index = 0, onSave, onCite, onView }: PaperCar
               <span>{paper.citationCount.toLocaleString()} citations</span>
             </div>
             <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs gap-1"
-                onClick={() => onView?.(paper.id)}
-              >
-                <ExternalLink className="h-3 w-3" />
-                View PDF
-              </Button>
+              {/* PDF link — real URL if available */}
+              {hasPdf ? (
+                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" asChild>
+                  <a href={paper.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-3 w-3" />
+                    PDF
+                  </a>
+                </Button>
+              ) : hasSource ? (
+                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" asChild>
+                  <a href={paper.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-3 w-3" />
+                    View
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs gap-1"
+                  onClick={() => onView?.(paper.id)}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  View
+                </Button>
+              )}
+
               <Button
                 variant="ghost"
                 size="sm"

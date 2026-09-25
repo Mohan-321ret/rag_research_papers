@@ -9,6 +9,8 @@ export interface Paper {
   citationCount: number;
   similarityScore: number;
   pdfUrl: string;
+  sourceUrl: string;  // canonical page (arXiv abs, DOI resolver, etc.)
+  source: "arxiv" | "pubmed" | "semantic_scholar" | "local";
   keywords: string[];
   saved?: boolean;
 }
@@ -24,7 +26,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.2005.11401",
     citationCount: 2847,
     similarityScore: 0.96,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2005.11401",
+    sourceUrl: "https://arxiv.org/abs/2005.11401",
+    source: "arxiv",
     keywords: ["RAG", "retrieval", "language models", "knowledge"],
   },
   {
@@ -37,7 +41,9 @@ export const mockPapers: Paper[] = [
     doi: "10.18653/v1/2020.emnlp-main.550",
     citationCount: 3124,
     similarityScore: 0.93,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2004.04906",
+    sourceUrl: "https://arxiv.org/abs/2004.04906",
+    source: "arxiv",
     keywords: ["dense retrieval", "question answering", "embeddings"],
   },
   {
@@ -50,7 +56,9 @@ export const mockPapers: Paper[] = [
     doi: "10.18653/v1/N19-1423",
     citationCount: 78542,
     similarityScore: 0.89,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/1810.04805",
+    sourceUrl: "https://arxiv.org/abs/1810.04805",
+    source: "arxiv",
     keywords: ["BERT", "transformers", "pre-training", "NLU"],
   },
   {
@@ -63,7 +71,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.1706.03762",
     citationCount: 112387,
     similarityScore: 0.87,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/1706.03762",
+    sourceUrl: "https://arxiv.org/abs/1706.03762",
+    source: "arxiv",
     keywords: ["transformer", "attention", "sequence-to-sequence"],
   },
   {
@@ -76,7 +86,9 @@ export const mockPapers: Paper[] = [
     doi: "10.1109/TBDATA.2019.2921572",
     citationCount: 1856,
     similarityScore: 0.91,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/1702.08734",
+    sourceUrl: "https://arxiv.org/abs/1702.08734",
+    source: "arxiv",
     keywords: ["FAISS", "similarity search", "vector indexing", "clustering"],
   },
   {
@@ -89,7 +101,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.2307.00000",
     citationCount: 892,
     similarityScore: 0.88,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2307.00000",
+    sourceUrl: "https://github.com/langchain-ai/langchain",
+    source: "arxiv",
     keywords: ["LangChain", "LLM", "framework", "composability"],
   },
   {
@@ -102,7 +116,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.2303.08774",
     citationCount: 5673,
     similarityScore: 0.85,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2303.08774",
+    sourceUrl: "https://arxiv.org/abs/2303.08774",
+    source: "arxiv",
     keywords: ["GPT-4", "multimodal", "large language model"],
   },
   {
@@ -115,7 +131,9 @@ export const mockPapers: Paper[] = [
     doi: "10.18653/v1/D19-1410",
     citationCount: 4201,
     similarityScore: 0.92,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/1908.10084",
+    sourceUrl: "https://arxiv.org/abs/1908.10084",
+    source: "arxiv",
     keywords: ["sentence embeddings", "BERT", "siamese networks", "STS"],
   },
   {
@@ -128,7 +146,9 @@ export const mockPapers: Paper[] = [
     doi: "10.1145/3397271.3401075",
     citationCount: 1534,
     similarityScore: 0.90,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2004.12832",
+    sourceUrl: "https://arxiv.org/abs/2004.12832",
+    source: "arxiv",
     keywords: ["ColBERT", "passage retrieval", "late interaction", "BERT"],
   },
   {
@@ -141,7 +161,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.1806.00000",
     citationCount: 12453,
     similarityScore: 0.84,
-    pdfUrl: "#",
+    pdfUrl: "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf",
+    sourceUrl: "https://openai.com/research/language-unsupervised",
+    source: "arxiv",
     keywords: ["GPT", "pre-training", "language understanding"],
   },
   {
@@ -154,7 +176,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.2001.08361",
     citationCount: 2891,
     similarityScore: 0.82,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2001.08361",
+    sourceUrl: "https://arxiv.org/abs/2001.08361",
+    source: "arxiv",
     keywords: ["scaling laws", "language models", "compute"],
   },
   {
@@ -167,7 +191,9 @@ export const mockPapers: Paper[] = [
     doi: "10.48550/arXiv.2203.02155",
     citationCount: 4892,
     similarityScore: 0.86,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2203.02155",
+    sourceUrl: "https://arxiv.org/abs/2203.02155",
+    source: "arxiv",
     keywords: ["RLHF", "instruction tuning", "alignment", "human feedback"],
   },
   {
@@ -180,7 +206,9 @@ export const mockPapers: Paper[] = [
     doi: "10.18653/v1/N18-3011",
     citationCount: 1267,
     similarityScore: 0.83,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/1805.02179",
+    sourceUrl: "https://www.semanticscholar.org/paper/Construction-of-the-Literature-Graph-in-Semantic-Ammar-Groeneveld/649def34f8be52c8b66281af98ae884c09aef38d",
+    source: "semantic_scholar",
     keywords: ["citation graph", "Semantic Scholar", "bibliometrics"],
   },
   {
@@ -193,7 +221,9 @@ export const mockPapers: Paper[] = [
     doi: "10.1145/3641289",
     citationCount: 423,
     similarityScore: 0.94,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2304.01852",
+    sourceUrl: "https://arxiv.org/abs/2304.01852",
+    source: "arxiv",
     keywords: ["LLM", "research assistance", "survey", "scientific writing"],
   },
   {
@@ -206,7 +236,9 @@ export const mockPapers: Paper[] = [
     doi: "10.14778/3641204.3641218",
     citationCount: 189,
     similarityScore: 0.88,
-    pdfUrl: "#",
+    pdfUrl: "https://arxiv.org/pdf/2309.11400",
+    sourceUrl: "https://arxiv.org/abs/2309.11400",
+    source: "arxiv",
     keywords: ["vector database", "embeddings", "similarity search", "AI infrastructure"],
   },
 ];

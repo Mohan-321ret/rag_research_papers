@@ -88,11 +88,11 @@ Studies show that RAG-based systems achieve:
 ## Recommendations
 For scientific research applications, a **hybrid RAG approach** combining dense retrieval (Sentence-BERT) with sparse methods (BM25) offers the best balance of accuracy and coverage [2][8][9].`,
   sources: [
-    { id: "p1", title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks", relevance: 0.96 },
-    { id: "p2", title: "Dense Passage Retrieval for Open-Domain Question Answering", relevance: 0.93 },
-    { id: "p5", title: "FAISS: A Library for Efficient Similarity Search", relevance: 0.91 },
-    { id: "p8", title: "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks", relevance: 0.92 },
-    { id: "p14", title: "A Survey of Large Language Models for Research Assistance", relevance: 0.94 },
+    { id: "p1", title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks", relevance: 0.96, url: "https://arxiv.org/abs/2005.11401", source: "arxiv" },
+    { id: "p2", title: "Dense Passage Retrieval for Open-Domain Question Answering", relevance: 0.93, url: "https://arxiv.org/abs/2004.04906", source: "arxiv" },
+    { id: "p5", title: "FAISS: A Library for Efficient Similarity Search", relevance: 0.91, url: "https://arxiv.org/abs/1702.08734", source: "arxiv" },
+    { id: "p8", title: "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks", relevance: 0.92, url: "https://arxiv.org/abs/1908.10084", source: "arxiv" },
+    { id: "p14", title: "A Survey of Large Language Models for Research Assistance", relevance: 0.94, url: "https://arxiv.org/abs/2304.01852", source: "arxiv" },
   ],
 };
 

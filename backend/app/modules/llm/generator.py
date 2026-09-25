@@ -36,9 +36,11 @@ from app.modules.llm.citation_generator import extract_citations
 from app.modules.llm.prompt_constructor import build_prompt
 from app.modules.llm.providers import (
     AnthropicProvider,
+    GroqProvider,
     LLMProvider,
     OllamaProvider,
     anthropic_available,
+    groq_available,
     ollama_configured,
 )
 
@@ -160,15 +162,28 @@ class LLMAnswerGenerator:
 def build_answer_generator(settings: Settings) -> ExtractiveAnswerGenerator | LLMAnswerGenerator:
     """Pick the generator per LLM_PROVIDER.
 
-    "auto" prefers Anthropic when credentials are configured (backward
-    compatible with earlier phases); otherwise Ollama — the
-    zero-credential local default this module starts with.
+    Priority for "auto":
+      1. Groq   — if GROQ_API_KEY / groq_api_key is set (fastest, cloud)
+      2. Anthropic — if ANTHROPIC_API_KEY is set
+      3. Ollama  — local fallback (requires a running Ollama server)
+      4. Extractive — deterministic, no LLM (always available)
     """
     provider = settings.llm_provider
     fallback = ExtractiveAnswerGenerator()
 
     if provider == "extractive":
         return fallback
+
+    if provider == "groq":
+        if not groq_available(settings.groq_api_key):
+            raise ServiceUnavailableError(
+                "LLM provider 'groq' selected but the groq package is not installed "
+                "or GROQ_API_KEY / groq_api_key is not set"
+            )
+        return LLMAnswerGenerator(
+            GroqProvider(settings.groq_api_key, settings.groq_model, settings.llm_max_tokens),
+            fallback,
+        )
 
     if provider == "anthropic":
         if not anthropic_available():
@@ -193,7 +208,12 @@ def build_answer_generator(settings: Settings) -> ExtractiveAnswerGenerator | LL
             fallback,
         )
 
-    # auto
+    # auto: Groq > Anthropic > Ollama > extractive
+    if groq_available(settings.groq_api_key):
+        return LLMAnswerGenerator(
+            GroqProvider(settings.groq_api_key, settings.groq_model, settings.llm_max_tokens),
+            fallback,
+        )
     if anthropic_available():
         return LLMAnswerGenerator(
             AnthropicProvider(settings.llm_model, settings.llm_max_tokens), fallback

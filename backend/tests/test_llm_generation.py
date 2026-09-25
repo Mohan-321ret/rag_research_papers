@@ -227,7 +227,7 @@ def test_factory_anthropic_explicit_without_credentials_raises() -> None:
 
 
 def test_factory_auto_without_anthropic_credentials_prefers_ollama() -> None:
-    settings = _settings(llm_provider="auto")
+    settings = _settings(llm_provider="auto", groq_api_key="")
     generator = build_answer_generator(settings)
     assert isinstance(generator, LLMAnswerGenerator)
     assert isinstance(generator.provider, OllamaProvider)

@@ -76,15 +76,19 @@ class Settings(BaseSettings):
 
     # Retrieval (baseline RAG)
     retrieval_min_score: float = 0.2
+    external_search_enabled: bool = True
 
     # Enterprise LLM (Module 8): provider behind a narrow generate(prompt)
-    # interface. "auto" prefers Anthropic when credentials are configured
-    # (backward compatible with earlier phases), else Ollama — the
-    # zero-credential local default this module starts with.
-    llm_provider: Literal["auto", "ollama", "anthropic", "extractive"] = "auto"
+    # interface. "auto" prefers Groq when GROQ_API_KEY is set, then
+    # Anthropic, then Ollama — the zero-credential local default.
+    llm_provider: Literal["auto", "groq", "ollama", "anthropic", "extractive"] = "auto"
     llm_max_tokens: int = 1024
 
     llm_model: str = "claude-opus-5"  # used when the Anthropic provider is active
+
+    # Groq (cloud LLM — very fast, free tier available)
+    groq_api_key: str = ""
+    groq_model: str = "qwen/qwen3.8-27b"  # available on this Groq key
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "gemma3:4b"  # any pulled Ollama model, e.g. llama3.2, gemma2

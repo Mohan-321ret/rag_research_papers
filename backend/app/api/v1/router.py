@@ -9,6 +9,7 @@ from app.api.v1.endpoints import (
     chat,
     conflicts,
     documents,
+    external,
     feedback,
     graph,
     health,
@@ -28,3 +29,4 @@ api_v1_router.include_router(knowledge.router)
 api_v1_router.include_router(feedback.router)
 api_v1_router.include_router(analytics.router)
 api_v1_router.include_router(admin.router)
+api_v1_router.include_router(external.router)
