@@ -1,1 +1,1 @@
-{"dimension": 384, "model": "sentence-transformers/all-MiniLM-L6-v2", "next_id": 175, "backend": "FaissVectorStore"}
+{"dimension": 384, "model": "sentence-transformers/all-MiniLM-L6-v2", "next_id": 190, "backend": "FaissVectorStore"}

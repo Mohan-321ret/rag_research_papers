@@ -1,0 +1,10 @@
+Title: ML-Asset Management: Curation, Discovery, and Utilization
+
+Published: 2025-09-28
+Source: arxiv | ID: 2509.23577v1
+URL: http://arxiv.org/abs/2509.23577v1
+
+
+
+Abstract:
+Machine learning (ML) assets, such as models, datasets, and metadata, are central to modern ML workflows. Despite their explosive growth in practice, these assets are often underutilized due to fragmented documentation, siloed storage, inconsistent licensing, and lack of unified discovery mechanisms, making ML-asset management an urgent challenge. This tutorial offers a comprehensive overview of ML-asset management activities across its lifecycle, including curation, discovery, and utilization. We provide a categorization of ML assets, and major management issues, survey state-of-the-art techniques, and identify emerging opportunities at each stage. We further highlight system-level challenges related to scalability, lineage, and unified indexing. Through live demonstrations of systems, this tutorial equips both researchers and practitioners with actionable insights and practical tools for advancing ML-asset management in real-world and domain-specific settings.

@@ -45,6 +45,8 @@ from app.services.query_intelligence_service import QueryIntelligenceService
 from app.services.retrieval_service import RetrievalService
 from app.services.verification_service import VerificationService
 
+from app.repositories.chunk_repository import ChunkRepository
+
 logger = get_logger(__name__)
 
 _SNIPPET_CHARS = 240
@@ -64,6 +66,7 @@ class ChatService:
         self._settings = settings
         self._session = session
         self._interactions = interaction_repository
+        self._chunks = ChunkRepository(session)
         self._query_intelligence = query_intelligence
         self._retrieval = retrieval
         self._context_fusion = context_fusion
@@ -150,11 +153,16 @@ class ChatService:
         latency_ms = round((time.perf_counter() - started) * 1000, 2)
 
         # The full raw candidate pool, for evaluating routing/fusion later.
+        # Filter to chunks present in the DB to satisfy FK constraints for external arXiv hits.
+        candidate_chunk_ids = [hit.item.chunk.id for hit in retrieval.items]
+        valid_log_ids = await self._chunks.filter_existing_chunk_ids(candidate_chunk_ids)
+
         await self._interactions.add_retrieval_logs(
             query_row.id,
             [
                 (hit.item.chunk.id, rank, hit.score, "+".join(hit.retrievers))
                 for rank, hit in enumerate(retrieval.items, start=1)
+                if hit.item.chunk.id in valid_log_ids
             ],
         )
         answer_row = await self._interactions.create_answer(
@@ -176,11 +184,15 @@ class ChatService:
             for marker in generation.cited_markers
             if 1 <= marker <= len(fusion.items)
         ]
+        cited_chunk_ids = [item.chunk_id for _, item in cited_items]
+        valid_citation_ids = await self._chunks.filter_existing_chunk_ids(cited_chunk_ids)
+
         await self._interactions.add_citations(
             answer_row.id,
             [
                 (item.chunk_id, marker, item.content[:_SNIPPET_CHARS])
                 for marker, item in cited_items
+                if item.chunk_id in valid_citation_ids
             ],
         )
         await self._session.commit()

@@ -1,0 +1,10 @@
+Title: Consistent Bounded-Asynchronous Parameter Servers for Distributed ML
+
+Published: 2013-12-30
+Source: arxiv | ID: 1312.7869v2
+URL: http://arxiv.org/abs/1312.7869v2
+
+
+
+Abstract:
+In distributed ML applications, shared parameters are usually replicated among computing nodes to minimize network overhead. Therefore, proper consistency model must be carefully chosen to ensure algorithm's correctness and provide high throughput. Existing consistency models used in general-purpose databases and modern distributed ML systems are either too loose to guarantee correctness of the ML algorithms or too strict and thus fail to fully exploit the computing power of the underlying distributed system.   Many ML algorithms fall into the category of \emph{iterative convergent algorithms} which start from a randomly chosen initial point and converge to optima by repeating iteratively a set of procedures. We've found that many such algorithms are to a bounded amount of inconsistency and still converge correctly. This property allows distributed ML to relax strict consistency models to improve system performance while theoretically guarantees algorithmic correctness. In this paper, we present several relaxed consistency models for asynchronous parallel computation and theoretically prove their algorithmic correctness. The proposed consistency models are implemented in a distributed parameter server and evaluated in the context of a popular ML application: topic modeling.

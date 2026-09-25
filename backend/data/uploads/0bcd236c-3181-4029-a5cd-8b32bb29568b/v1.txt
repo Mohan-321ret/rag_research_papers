@@ -1,0 +1,10 @@
+Title: Close Encounters of the Higher Kind Emulating Constructor Classes in Standard ML
+
+Published: 2016-08-11
+Source: arxiv | ID: 1608.03350v1
+URL: http://arxiv.org/abs/1608.03350v1
+
+
+
+Abstract:
+We implement a library for encoding constructor classes in Standard ML, including elaboration from minimal definitions, and automatic instantiation of superclasses.

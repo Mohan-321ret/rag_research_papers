@@ -32,6 +32,13 @@ class ConflictCandidate(NamedTuple):
 
 
 class ChunkRepository(BaseRepository):
+    async def filter_existing_chunk_ids(self, chunk_ids: list[uuid.UUID]) -> set[uuid.UUID]:
+        if not chunk_ids:
+            return set()
+        stmt = select(DocumentChunk.id).where(DocumentChunk.id.in_(chunk_ids))
+        res = await self._session.execute(stmt)
+        return set(res.scalars().all())
+
     async def add_chunks(self, chunks: list[DocumentChunk]) -> None:
         self._session.add_all(chunks)
         await self._session.flush()
